@@ -108,7 +108,10 @@ section{position:relative}
 .idea{background:var(--amethyst);overflow:hidden;isolation:isolate;cursor:crosshair}
 .idea canvas.flow{position:absolute;inset:0;width:100%;height:100%;z-index:-1;display:block}
 .idea .ct{position:relative;z-index:1}
-.idea .pillars p,.idea .mono.dim{opacity:1}
+.idea .pillars p,.idea .dim{opacity:1}
+/* G0 round 2: Rust heading stays large text on phones; contrast pills never touch the sample line */
+.band:last-child .bname b{font-size:clamp(19px,1.6vw,26px)}
+@media (max-width:900px){.strip .g12{row-gap:10px}}
 .idea .sh-t{font-size:clamp(48px,7vw,130px);grid-column:4/11}
 .idea .sh-t span{display:inline-block;transition:opacity .8s var(--ease),transform .9s var(--ease);transition-delay:calc(var(--i)*60ms)}
 .idea .sh-t.pre{opacity:1;transform:none}.idea .sh-t.pre span{opacity:0;transform:translateY(.4em)}
@@ -554,7 +557,7 @@ section{position:relative}
     bar.style.transform='scaleX('+pct.toFixed(4)+')'; railpct.textContent=String(Math.round(pct*100)).padStart(2,'0')+'%';
     let cur=secs[0]; for(const s of secs){if(s.getBoundingClientRect().top<=innerHeight*.35)cur=s;} railsec.textContent='§'+cur.dataset.sec;
     par.forEach(el=>{const r=el.parentElement.getBoundingClientRect();el.style.transform='translate3d(0,'+(r.top*+el.dataset.par).toFixed(1)+'px,0)';});
-    if(!reduce&&wide()){const m=prog(man);sl.forEach(el=>{el.style.transform='translate3d('+((m-.5)*+el.dataset.slide*-8).toFixed(2)+'vw,0,0)';});}
+    if(!reduce&&wide()){const m=prog(man);sl.forEach(el=>{el.style.transform='translate3d('+((m-.5)*+el.dataset.slide*-5).toFixed(2)+'vw,0,0)';});}
     // journey: active step = the one crossing half of the viewport
     let act=0; steps.forEach((s,i)=>{if(s.getBoundingClientRect().top<innerHeight*.5)act=i;}); steps.forEach((s,i)=>s.classList.toggle('on',i===act||reduce));
     jnow.textContent='0'+(act+1); jname.textContent=names[act]; jbar.style.transform='scaleX('+((act+1)/steps.length)+')';
@@ -582,8 +585,8 @@ section{position:relative}
     if(!cv){cv=document.createElement('canvas');cv.className='flow';cv.setAttribute('aria-hidden','true');stage.prepend(cv);}
     const cx=cv.getContext('2d');
     const BASE='#342A48', FIELDS=[ // colour, alpha, home x/y (0-1), radius (x panel width), drift speed
-      ['#7A98B3',.62,.18,.30,.42,.00021],['#D2512F',.55,.78,.72,.34,.00017],['#CCD5BC',.34,.55,.15,.30,.00025],
-      ['#7A98B3',.42,.92,.20,.28,.00019],['#1E1730',.70,.40,.88,.40,.00015],['#D2512F',.30,.05,.85,.26,.00023]];
+      ['#7A98B3',.50,.18,.30,.42,.00021],['#D2512F',.55,.78,.72,.34,.00017],['#CCD5BC',.24,.55,.15,.30,.00025],
+      ['#7A98B3',.34,.92,.20,.28,.00019],['#1E1730',.70,.40,.88,.40,.00015],['#D2512F',.30,.05,.85,.26,.00023]];
     const P=FIELDS.map(([c,a,hx,hy,r,s],i)=>({c,a,hx,hy,r,s,ph:i*1.7,x:hx,y:hy,vx:0,vy:0}));
     let W=0,H=0,dpr=1,ptr=null,run=false,raf=0;
     const hex=(h,a)=>{const n=parseInt(h.slice(1),16);return 'rgba('+(n>>16)+','+(n>>8&255)+','+(n&255)+','+a+')';};
@@ -604,8 +607,10 @@ section{position:relative}
         cx.strokeStyle='rgba(237,237,236,.9)'; cx.lineWidth=1; cx.beginPath();
         cx.moveTo(ptr.x-14,ptr.y);cx.lineTo(ptr.x-4,ptr.y);cx.moveTo(ptr.x+4,ptr.y);cx.lineTo(ptr.x+14,ptr.y);
         cx.moveTo(ptr.x,ptr.y-14);cx.lineTo(ptr.x,ptr.y-4);cx.moveTo(ptr.x,ptr.y+4);cx.lineTo(ptr.x,ptr.y+14);cx.stroke();
-        cx.fillStyle='rgba(237,237,236,.9)'; cx.font='500 11px "Geist Mono", monospace';
-        cx.fillText('X '+(ptr.x/W).toFixed(3)+' · Y '+(ptr.y/H).toFixed(3),ptr.x+18,ptr.y+26);
+        const lab='X '+(ptr.x/W).toFixed(3)+' · Y '+(ptr.y/H).toFixed(3); cx.font='500 12px "Geist Mono", monospace';
+        const tw=cx.measureText(lab).width; cx.fillStyle='#131313'; cx.beginPath();
+        if(cx.roundRect) cx.roundRect(ptr.x+16,ptr.y+14,tw+16,20,10); else cx.rect(ptr.x+16,ptr.y+14,tw+16,20); cx.fill();
+        cx.fillStyle='#EDEDEC'; cx.fillText(lab,ptr.x+24,ptr.y+28);
       }
     }
     function loop(t){draw(t); if(run) raf=requestAnimationFrame(loop);}
